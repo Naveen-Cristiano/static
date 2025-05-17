@@ -1,1 +1,85 @@
-http://alb-project1-1266093429.ap-south-1.elb.amazonaws.com/
+cat << 'EOF' > /var/www/html/index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Welcome Xabi Alonso</title>
+  <style>
+    body {
+      background-color: #ffffff;
+      color: #000000;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 40px;
+      line-height: 1.6;
+    }
+    h1 {
+      color: #ff6600;
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+    h2 {
+      font-size: 28px;
+      margin-bottom: 30px;
+    }
+    .section h3 {
+      color: #333333;
+      font-size: 24px;
+      border-bottom: 2px solid #ff6600;
+      padding-bottom: 5px;
+      margin-bottom: 15px;
+    }
+    ul { list-style-type: none; padding-left: 0; }
+    li { padding: 5px 0; }
+  </style>
+</head>
+<body>
+  <h1>Welcome Xabi Alonso</h1>
+  <h2>Make Real Madrid Proud</h2>
+  <div class="section">
+    <h3>Forwards</h3>
+    <ul>
+      <li>Kylian Mbappé</li>
+      <li>Vinícius Júnior</li>
+      <li>Rodrygo Goes</li>
+      <li>Endrick</li>
+      <li>Brahim Díaz</li>
+    </ul>
+  </div>
+  <div class="section">
+    <h3>Midfielders</h3>
+    <ul>
+      <li>Jude Bellingham</li>
+      <li>Eduardo Camavinga</li>
+      <li>Federico Valverde</li>
+      <li>Luka Modrić</li>
+      <li>Aurélien Tchouaméni</li>
+      <li>Arda Güler</li>
+      <li>Dani Ceballos</li>
+      <li>Lucas Vázquez</li>
+    </ul>
+  </div>
+  <div class="section">
+    <h3>Defenders</h3>
+    <ul>
+      <li>Éder Militão</li>
+      <li>David Alaba</li>
+      <li>Antonio Rüdiger</li>
+      <li>Dani Carvajal</li>
+      <li>Fran García</li>
+      <li>Lucas Vázquez</li>
+      <li>Raúl Asencio</li>
+      <li>Dean Huijsen</li>
+      <li>Álvaro Carreras</li>
+    </ul>
+  </div>
+  <div class="section">
+    <h3>Goalkeepers</h3>
+    <ul>
+      <li>Thibaut Courtois</li>
+      <li>Andriy Lunin</li>
+      <li>Fran González</li>
+    </ul>
+  </div>
+</body>
+</html>
+EOF
