@@ -4,3 +4,5 @@ files:
   - source: /
     destination: /var/www/html
     overwrite:true
+
+hooks: {}
