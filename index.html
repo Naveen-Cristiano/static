@@ -3,10 +3,12 @@ os: linux
 files:
   - source: /
     destination: /var/www/html
-    overwrite: true
 
 hooks:
-  BeforeInstall: []
+  BeforeInstall:
+    - location: scripts/cleanup.sh
+      timeout: 300
+      runas: root
   AfterInstall: []
   ApplicationStart: []
   ValidateService: []
