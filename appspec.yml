@@ -3,6 +3,10 @@ os: linux
 files:
   - source: /
     destination: /var/www/html
-    overwrite:true
+    overwrite: true
 
-hooks: {}
+hooks:
+  BeforeInstall: []
+  AfterInstall: []
+  ApplicationStart: []
+  ValidateService: []
