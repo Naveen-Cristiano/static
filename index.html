@@ -1,14 +1,5 @@
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Sid": "AllowALBLogsPutObject",
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "logdelivery.elasticloadbalancing.amazonaws.com"
-      },
-      "Action": "s3:PutObject",
-      "Resource": "arn:aws:s3:::alb-access-logs-alb-project1/Alb-Project1/AWSLogs/*"
-    }
-  ]
-}
+fields @timestamp, interfaceId, srcAddr, dstAddr, srcPort, dstPort, action
+| filter interfaceId in ['eni-xyz123', 'eni-abc456']
+| filter dstPort = 80 or dstPort = 443
+| sort @timestamp desc
+| limit 100
