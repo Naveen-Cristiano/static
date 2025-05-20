@@ -7,13 +7,17 @@
       "Principal": {
         "AWS": "arn:aws:iam::149536497934:root"
       },
-      "Action": [
-        "s3:GetBucketLocation",
-        "s3:PutObject"
-      ],
-      "Resource": [
-        "arn:aws:s3:::athena-query-results-sagar/*"
-      ]
+      "Action": "s3:GetBucketLocation",
+      "Resource": "arn:aws:s3:::bucketforathenaqueries-alblogs"
+    },
+    {
+      "Sid": "AllowAthenaToWriteLogs",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::149536497934:root"
+      },
+      "Action": "s3:PutObject",
+      "Resource": "arn:aws:s3:::bucketforathenaqueries-alblogs/*"
     }
   ]
 }
