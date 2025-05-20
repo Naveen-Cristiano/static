@@ -1,14 +1,14 @@
-version: 0.0
-os: linux
-files:
-  - source: /
-    destination: /var/www/html
-
-hooks:
-  BeforeInstall:
-    - location: scripts/cleanup.sh
-      timeout: 300
-      runas: root
-  AfterInstall: []
-  ApplicationStart: []
-  ValidateService: []
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowALBLogsPutObject",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "logdelivery.elasticloadbalancing.amazonaws.com"
+      },
+      "Action": "s3:PutObject",
+      "Resource": "arn:aws:s3:::alb-access-logs-alb-project1/Alb-Project1/AWSLogs/*"
+    }
+  ]
+}
