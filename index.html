@@ -1,5 +1,19 @@
-fields @timestamp, interfaceId, srcAddr, dstAddr, srcPort, dstPort, action
-| filter interfaceId in ['eni-xyz123', 'eni-abc456']
-| filter dstPort = 80 or dstPort = 443
-| sort @timestamp desc
-| limit 100
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowAthenaAndGlueAccess",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::149536497934:root"
+      },
+      "Action": [
+        "s3:GetBucketLocation",
+        "s3:PutObject"
+      ],
+      "Resource": [
+        "arn:aws:s3:::athena-query-results-sagar/*"
+      ]
+    }
+  ]
+}
