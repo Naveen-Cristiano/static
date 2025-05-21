@@ -1,1 +1,40 @@
-%{TIMESTAMP_ISO8601:timestamp} %{NOTSPACE:elb} %{IP:client_ip}:%{NUMBER:client_port} %{IP:target_ip}:%{NUMBER:target_port} %{NUMBER:request_processing_time:float} %{NUMBER:backend_processing_time:float} %{NUMBER:response_processing_time:float} %{NUMBER:elb_status_code} %{NUMBER:target_status_code} %{NUMBER:received_bytes} %{NUMBER:sent_bytes} "%{DATA:request}" "%{DATA:user_agent}" %{NOTSPACE:ssl_cipher} %{NOTSPACE:ssl_protocol} %{NOTSPACE:target_group_arn} "%{DATA:trace_id}" "%{DATA:domain_name}" "%{DATA:chosen_cert_arn}" %{NOTSPACE:matched_rule_priority} %{NOTSPACE:request_creation_time} "%{DATA:actions_executed}" "%{DATA:redirect_url}" "%{DATA:lambda_error_reason}" "%{DATA:target_port_list}" "%{DATA:target_status_code_list}" "%{DATA:classification}" "%{DATA:classification_reason}"
+CREATE EXTERNAL TABLE alb_logs (
+  type string,
+  time string,
+  elb string,
+  client_ip_port string,
+  target_ip_port string,
+  request_processing_time double,
+  target_processing_time double,
+  response_processing_time double,
+  elb_status_code string,
+  target_status_code string,
+  received_bytes bigint,
+  sent_bytes bigint,
+  request_verb string,
+  request_url string,
+  request_proto string,
+  user_agent string,
+  ssl_cipher string,
+  ssl_protocol string,
+  target_group_arn string,
+  trace_id string,
+  domain_name string,
+  chosen_cert_arn string,
+  matched_rule_priority string,
+  request_creation_time string,
+  actions_executed string,
+  redirect_url string,
+  lambda_error_reason string,
+  target_port_list string,
+  target_status_code_list string,
+  classification string,
+  classification_reason string
+)
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.RegexSerDe'
+WITH SERDEPROPERTIES (
+  "input.regex" = "([^ ]*) ([^ ]*) ([^ ]*) ([^ ]*):([0-9]*) ([^ ]*):([0-9]*) ([^ ]*) ([^ ]*) ([^ ]*) ([^ ]*) ([^ ]*) \"([^ ]*) ([^ ]*) ([^ ]*)\" \"([^\"]*)\" ([^ ]*) ([^ ]*) ([^ ]*) ([^ ]*) ([^ ]*) ([^ ]*) ([^ ]*) ([^ ]*) ([^ ]*) ([^ ]*) ([^ ]*) ([^ ]*) ([^ ]*)",
+  "output.format.class" = "org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat"
+)
+STORED AS TEXTFILE
+LOCATION 's3://alb-access-logs-alb-project1/Alb-Project1/AWSLogs/149536497934/elasticloadbalancing/ap-south-1/';
