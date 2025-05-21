@@ -1,8 +1,23 @@
-SELECT *
+SELECT
+  client_ip_port,
+  COUNT(*) AS request_count,
+  COUNT(DISTINCT user_agent) AS distinct_user_agents,
+  MAX(elb_status_code) AS max_elb_code,
+  MAX(target_status_code) AS max_target_code,
+  MIN(time) AS first_seen,
+  MAX(time) AS last_seen
 FROM alb_logs
-WHERE year = '2025'
-  AND month = '05'
-  AND day = '20'
-  AND elb_status_code BETWEEN 400 AND 499
-ORDER BY time DESC
-LIMIT 100;
+WHERE year = '2025' AND month = '05' AND day = '21'
+  AND (
+    user_agent IS NULL
+    OR user_agent = ''
+    OR LOWER(user_agent) LIKE '%bot%'
+    OR LOWER(user_agent) LIKE '%curl%'
+    OR LOWER(user_agent) LIKE '%python%'
+    OR LOWER(user_agent) LIKE '%wget%'
+    OR elb_status_code >= 400
+    OR target_status_code >= 400
+  )
+GROUP BY client_ip_port
+ORDER BY request_count DESC
+LIMIT 20;
