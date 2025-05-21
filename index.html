@@ -1,42 +1,8 @@
-CREATE EXTERNAL TABLE alb_logs (
-  type string,
-  time string,
-  elb string,
-  client_ip_port string,
-  target_ip_port string,
-  request_processing_time double,
-  target_processing_time double,
-  response_processing_time double,
-  elb_status_code int,
-  target_status_code int,
-  received_bytes bigint,
-  sent_bytes bigint,
-  request_verb string,
-  request_url string,
-  request_proto string,
-  user_agent string,
-  ssl_cipher string,
-  ssl_protocol string,
-  target_group_arn string,
-  trace_id string,
-  domain_name string,
-  chosen_cert_arn string,
-  matched_rule_priority string,
-  request_creation_time string,
-  actions_executed string,
-  redirect_url string,
-  error_reason string,
-  target_port_list string,
-  target_status_code_list string,
-  classification string,
-  classification_reason string
-)
-PARTITIONED BY (year string, month string, day string)
-ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'
-WITH SERDEPROPERTIES (
-  'serialization.format' = ' ',
-  'field.delim' = ' '
-)
-STORED AS TEXTFILE
-LOCATION 's3://alb-access-logs-alb-project1/Alb-Project1/AWSLogs/149536497934/elasticloadbalancing/ap-south-1/'
-TBLPROPERTIES ('skip.header.line.count'='0');
+SELECT *
+FROM alb_logs
+WHERE year = '2025'
+  AND month = '05'
+  AND day = '20'
+  AND elb_status_code BETWEEN 400 AND 499
+ORDER BY time DESC
+LIMIT 100;
