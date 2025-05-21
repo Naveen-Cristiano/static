@@ -7,8 +7,8 @@ CREATE EXTERNAL TABLE alb_logs (
   request_processing_time double,
   target_processing_time double,
   response_processing_time double,
-  elb_status_code string,
-  target_status_code string,
+  elb_status_code int,
+  target_status_code int,
   received_bytes bigint,
   sent_bytes bigint,
   request_verb string,
@@ -25,16 +25,18 @@ CREATE EXTERNAL TABLE alb_logs (
   request_creation_time string,
   actions_executed string,
   redirect_url string,
-  lambda_error_reason string,
+  error_reason string,
   target_port_list string,
   target_status_code_list string,
   classification string,
   classification_reason string
 )
-ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.RegexSerDe'
+PARTITIONED BY (year string, month string, day string)
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'
 WITH SERDEPROPERTIES (
-  "input.regex" = "([^ ]*) ([^ ]*) ([^ ]*) ([^ ]*):([0-9]*) ([^ ]*):([0-9]*) ([^ ]*) ([^ ]*) ([^ ]*) ([^ ]*) ([^ ]*) \"([^ ]*) ([^ ]*) ([^ ]*)\" \"([^\"]*)\" ([^ ]*) ([^ ]*) ([^ ]*) ([^ ]*) ([^ ]*) ([^ ]*) ([^ ]*) ([^ ]*) ([^ ]*) ([^ ]*) ([^ ]*) ([^ ]*) ([^ ]*)",
-  "output.format.class" = "org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat"
+  'serialization.format' = ' ',
+  'field.delim' = ' '
 )
 STORED AS TEXTFILE
-LOCATION 's3://alb-access-logs-alb-project1/Alb-Project1/AWSLogs/149536497934/elasticloadbalancing/ap-south-1/';
+LOCATION 's3://alb-access-logs-alb-project1/Alb-Project1/AWSLogs/149536497934/elasticloadbalancing/ap-south-1/'
+TBLPROPERTIES ('skip.header.line.count'='0');
