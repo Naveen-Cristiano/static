@@ -2,22 +2,22 @@
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Sid": "AllowAthenaAndGlueAccess",
+      "Sid": "AllowALBLogsPutObject",
       "Effect": "Allow",
       "Principal": {
-        "AWS": "arn:aws:iam::149536497934:root"
-      },
-      "Action": "s3:GetBucketLocation",
-      "Resource": "arn:aws:s3:::bucketforathenaqueries-alblogs"
-    },
-    {
-      "Sid": "AllowAthenaToWriteLogs",
-      "Effect": "Allow",
-      "Principal": {
-        "AWS": "arn:aws:iam::149536497934:root"
+        "Service": "logdelivery.elasticloadbalancing.amazonaws.com"
       },
       "Action": "s3:PutObject",
-      "Resource": "arn:aws:s3:::bucketforathenaqueries-alblogs/*"
+      "Resource": "arn:aws:s3:::alb-access-logs-alb-project1/Alb-Project1/*"
+    },
+    {
+      "Sid": "AllowGlueCrawlerReadAccess",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::123456789012:role/AWSGlueServiceRole-1"
+      },
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::alb-access-logs-alb-project1/Alb-Project1/*"
     }
   ]
 }
