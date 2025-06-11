@@ -1,8 +1,15 @@
 provider "aws" {
-  region = "us-east-1"
+  region = "ap-south-1"
 }
 
-resource "aws_instance" "example" {
-  ami           = "ami-0c55b159cbfafe1f0" # Replace with your own AMI
-  instance_type = "t2.micro"
+resource "aws_instance" "my_second_instance" {
+  ami                         = "ami-xxxxxxxxxxxxxxxxx"  # Replace with same AMI ID used in first instance
+  instance_type               = "t2.micro"
+  key_name                    = "your-keypair-name"      # Replace with your key pair
+  subnet_id                   = "subnet-xxxxxxxxxxxxxxxx" # Use a subnet from another AZ
+  vpc_security_group_ids      = ["sg-xxxxxxxxxxxxxxxx"]   # Replace with same or new SG
+
+  tags = {
+    Name = "SecondInstance-Terraform"
+  }
 }
