@@ -1,17 +1,3 @@
-version: 0.0
-os: linux
-files:
-  - source: /
-    destination: /var/www/html
-
-hooks:
-  BeforeInstall:
-    - location: scripts/Cleanup.sh
-      timeout: 30
-      runas: root
-  AfterInstall:
-    - location: scripts/ClearAppspec.sh
-      timeout: 30
-      runas: root
-  ApplicationStart: []
-  ValidateService: []
+version https://git-lfs.github.com/spec/v1
+oid sha256:fcfe4b754771ad788e34257e6a1c2e3a2d4bcbcd6443ffecc00c7c6f4147f131
+size 325
