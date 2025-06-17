@@ -3,12 +3,12 @@ from flask import Flask, render_template_string
 app = Flask(__name__)
 
 # Replace this with your real CloudFront domain
-CLOUDFRONT_URL = "https://d123abc4xyz.cloudfront.net/players"
+CLOUDFRONT_URL = "https://d1o92qaptx4j65.cloudfront.net"
 
 players = [
-    {"name": "Benzema", "image": f"{CLOUDFRONT_URL}/benzema.jpg"},
-    {"name": "Modric", "image": f"{CLOUDFRONT_URL}/modric.jpg"},
-    {"name": "Vinicius", "image": f"{CLOUDFRONT_URL}/vinicius.jpg"},
+    {"name": "cristiano", "image": f"{CLOUDFRONT_URL}/cristiano.jpg"},
+    {"name": "modric", "image": f"{CLOUDFRONT_URL}/modric.jpg"},
+    {"name": "kross", "image": f"{CLOUDFRONT_URL}/kross.jpg"},
 ]
 
 @app.route('/')
