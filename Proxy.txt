@@ -38,3 +38,19 @@ def lambda_handler(event, context):
             'statusCode': 500,
             'body': json.dumps('Failed')
         }
+
+
+{
+  "Records": [
+    {
+      "s3": {
+        "bucket": {
+          "name": "your-s3-bucket-name"
+        },
+        "object": {
+          "key": "cristiano.jpg"
+        }
+      }
+    }
+  ]
+}
