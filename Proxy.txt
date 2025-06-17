@@ -5,10 +5,10 @@ app = Flask(__name__)
 
 # Replace with your actual DB credentials and CloudFront URL
 DB_CONFIG = {
-    'host': 'your-writer-endpoint.rds.amazonaws.com',
+    'host': 'database-1.cluster-c7uq2skoqqmb.ap-south-1.rds.amazonaws.com',
     'user': 'Admin',
-    'password': 'YourPassword',
-    'database': 'realmadird_db'
+    'password': 'Naveensagar30',
+    'database': 'realmadrid_db'
 }
 
 CLOUDFRONT_URL = "https://d1o92qaptx4j65.cloudfront.net"
