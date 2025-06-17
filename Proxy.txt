@@ -1,17 +1,40 @@
-CREATE TABLE players (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    player_name VARCHAR(255),
-    image_file VARCHAR(255)
-);
+import json
+import boto3
+import pymysql
 
-INSERT INTO players (player_name, image_file)
-VALUES 
-('Cristiano Ronaldo', 'cristiano.jpg'),
-('Luka Modric', 'modric.jpg'),
-('Toni Kroos', 'kross.jpg');
+# Database configuration
+db_config = {
+    "host": "your-db-cluster-endpoint",
+    "user": "Admin",
+    "password": "your-password",
+    "database": "realmadrid_db"
+}
 
-CREATE TABLE users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(100) NOT NULL,
-    password VARCHAR(100) NOT NULL
-);
+def lambda_handler(event, context):
+    try:
+        for record in event['Records']:
+            bucket = record['s3']['bucket']['name']
+            key = record['s3']['object']['key']  # e.g., cristiano.jpg
+
+            # Extract player name from file name
+            player_name = key.split('.')[0].replace('-', ' ').title()
+
+            connection = pymysql.connect(**db_config)
+            with connection.cursor() as cursor:
+                query = "INSERT INTO players (player_name, image_file) VALUES (%s, %s)"
+                cursor.execute(query, (player_name, key))
+                connection.commit()
+
+            print(f"Inserted {player_name} with image {key} into DB.")
+
+        return {
+            'statusCode': 200,
+            'body': json.dumps('Success')
+        }
+
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return {
+            'statusCode': 500,
+            'body': json.dumps('Failed')
+        }
