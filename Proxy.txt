@@ -1,21 +1,72 @@
-from flask import Flask, render_template_string, request, redirect
+from flask import Flask, render_template_string, request, redirect, session
 import mysql.connector
 
 app = Flask(__name__)
+app.secret_key = 'super-secret-key'  # Needed for session management
 
-# Replace with your actual DB credentials and CloudFront URL
+# DB credentials and CloudFront URL
 DB_CONFIG = {
     'host': 'database-1.cluster-c7uq2skoqqmb.ap-south-1.rds.amazonaws.com',
     'user': 'Admin',
     'password': 'Naveensagar30',
     'database': 'realmadrid_db'
 }
-
 CLOUDFRONT_URL = "https://d1o92qaptx4j65.cloudfront.net"
 
+# -------------------- HOME PAGE --------------------
 @app.route('/')
 def home():
-    # Fetch player gallery from DB
+    return render_template_string('''
+        <html>
+        <head>
+            <title>Welcome</title>
+            <style>
+                body {
+                    background-color: orange;
+                    font-family: Arial, sans-serif;
+                    color: white;
+                    text-align: center;
+                    margin-top: 100px;
+                }
+                .form-box {
+                    margin: 20px auto;
+                    padding: 20px;
+                    width: 300px;
+                    background-color: white;
+                    color: black;
+                    border-radius: 10px;
+                }
+            </style>
+        </head>
+        <body>
+            <h1>Welcome to RealMadrid</h1>
+            <div class="form-box">
+                <h3>Signup</h3>
+                <form method="POST" action="/signup">
+                    Username: <input name="username" required><br><br>
+                    Password: <input name="password" type="password" required><br><br>
+                    <button type="submit">Signup</button>
+                </form>
+            </div>
+
+            <div class="form-box">
+                <h3>Login</h3>
+                <form method="POST" action="/login">
+                    Username: <input name="username" required><br><br>
+                    Password: <input name="password" type="password" required><br><br>
+                    <button type="submit">Login</button>
+                </form>
+            </div>
+        </body>
+        </html>
+    ''')
+
+# -------------------- DASHBOARD --------------------
+@app.route('/dashboard')
+def dashboard():
+    if 'username' not in session:
+        return redirect('/')
+    
     conn = mysql.connector.connect(**DB_CONFIG)
     cursor = conn.cursor(dictionary=True)
     cursor.execute("SELECT * FROM players")
@@ -25,33 +76,35 @@ def home():
     conn.close()
 
     return render_template_string('''
-        <h2>Welcome to RealMadrid Fan App!</h2>
-
-        <h3>User Actions:</h3>
-        <form method="POST" action="/signup">
-            <h4>Signup:</h4>
-            Username: <input name="username" required><br>
-            Password: <input name="password" type="password" required><br>
-            <button type="submit">Signup</button>
-        </form>
-
-        <form method="POST" action="/login" style="margin-top:20px;">
-            <h4>Login:</h4>
-            Username: <input name="username" required><br>
-            Password: <input name="password" type="password" required><br>
-            <button type="submit">Login</button>
-        </form>
-
-        <h3 style="margin-top:40px;">Player Gallery:</h3>
-        {% for player in players %}
-            <div style="margin: 10px;">
-                <strong>{{ player.player_name }}</strong><br>
-                <img src="{{ player.image_file }}" width="200"><br><br>
-            </div>
-        {% endfor %}
+        <html>
+        <head>
+            <title>RealMadrid Fan App</title>
+            <style>
+                body {
+                    font-family: Arial;
+                    background-color: #f0f0f0;
+                    text-align: center;
+                    color: #333;
+                }
+                .player-card {
+                    margin: 20px;
+                }
+            </style>
+        </head>
+        <body>
+            <h2>Welcome to RealMadrid Fan App!</h2>
+            <h3>Player Gallery:</h3>
+            {% for player in players %}
+                <div class="player-card">
+                    <strong>{{ player.player_name }}</strong><br>
+                    <img src="{{ player.image_file }}" width="200"><br><br>
+                </div>
+            {% endfor %}
+        </body>
+        </html>
     ''', players=players)
 
-
+# -------------------- SIGNUP --------------------
 @app.route('/signup', methods=['POST'])
 def signup():
     username = request.form['username']
@@ -63,9 +116,10 @@ def signup():
     conn.commit()
     conn.close()
 
-    return redirect('/')
+    session['username'] = username
+    return redirect('/dashboard')
 
-
+# -------------------- LOGIN --------------------
 @app.route('/login', methods=['POST'])
 def login():
     username = request.form['username']
@@ -78,6 +132,10 @@ def login():
     conn.close()
 
     if user:
-        return f"<h3>Welcome back, {username}!</h3><br><a href='/'>Go to Home</a>"
+        session['username'] = username
+        return redirect('/dashboard')
     else:
-        return "<h3>Login failed. Please try again.</h3><br><a href='/'>Go to Home</a>"
+        return '''
+            <h3>Login failed. Please try again.</h3>
+            <a href="/">Go to Home</a>
+        '''
