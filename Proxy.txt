@@ -1,37 +1,38 @@
 import json
 import boto3
 import pymysql
-import os
 
 # Database configuration
 db_config = {
-    "host": "your-db-cluster-endpoint",
-    "user": "Admin",
-    "password": "your-password",
+    "host": "your-db-cluster-endpoint",       # Replace with your DB cluster endpoint (writer)
+    "user": "Admin",                          # Replace with your DB username
+    "password": "your-password",              # Replace with your DB password
     "database": "realmadrid_db"
 }
 
 def lambda_handler(event, context):
     try:
         for record in event['Records']:
-            bucket = record['s3']['bucket']['name']
-            s3_key = record['s3']['object']['key']  # e.g., Players/Benzema.jpg
+            key = record['s3']['object']['key']  # e.g., players/benzema.jpg
 
-            # Extract just the file name (remove any folder prefix like "Players/")
-            image_file = os.path.basename(s3_key)  # e.g., Benzema.jpg
+            # Skip if it's not under the 'players/' folder
+            if not key.startswith("players/"):
+                continue
 
-            # Remove extension and format player name
-            player_name = os.path.splitext(image_file)[0].replace('-', ' ').title()  # e.g., "Toni Kroos"
+            # Extract file name from path: players/benzema.jpg → benzema.jpg
+            filename = key.split('/')[-1]
+
+            # Extract player name from filename: benzema.jpg → Benzema
+            player_name = filename.split('.')[0].replace('-', ' ').title()
 
             # Insert into DB
             connection = pymysql.connect(**db_config)
             with connection.cursor() as cursor:
-                sql = "INSERT INTO players (player_name, image_file) VALUES (%s, %s)"
-                cursor.execute(sql, (player_name, image_file))
+                query = "INSERT INTO players (player_name, image_file) VALUES (%s, %s)"
+                cursor.execute(query, (player_name, filename))
                 connection.commit()
-                print(f"Inserted {player_name} → {image_file}")
 
-            connection.close()
+            print(f"Inserted {player_name} ({filename}) into DB.")
 
         return {
             'statusCode': 200,
@@ -39,24 +40,8 @@ def lambda_handler(event, context):
         }
 
     except Exception as e:
-        print("Error:", str(e))
+        print(f"Error: {str(e)}")
         return {
             'statusCode': 500,
             'body': json.dumps('Failed')
         }
-
-
-{
-  "Records": [
-    {
-      "s3": {
-        "bucket": {
-          "name": "your-s3-bucket-name"
-        },
-        "object": {
-          "key": "cristiano.jpg"
-        }
-      }
-    }
-  ]
-}
