@@ -4,13 +4,21 @@ import mysql.connector
 app = Flask(__name__)
 app.secret_key = 'super-secret-key'  # Needed for session management
 
-# DB credentials and CloudFront URL
-DB_CONFIG = {
-    'host': 'database-1-instance-1.c7uq2skoqqmb.ap-south-1.rds.amazonaws.com',
+# Separate DB configurations
+writer_config = {
+    'host': 'database-1-instance-1.c7uq2skoqqmb.ap-south-1.rds.amazonaws.com',  # Writer endpoint
     'user': 'Admin',
     'password': 'Naveensagar30',
     'database': 'realmadrid_db'
 }
+
+reader_config = {
+    'host': 'database-1-instance-1.cluster-ro-c7uq2skoqqmb.ap-south-1.rds.amazonaws.com',  # Reader endpoint
+    'user': 'Admin',
+    'password': 'Naveensagar30',
+    'database': 'realmadrid_db'
+}
+
 CLOUDFRONT_URL = "https://d1o92qaptx4j65.cloudfront.net"
 
 # -------------------- HOME PAGE --------------------
@@ -67,7 +75,7 @@ def dashboard():
     if 'username' not in session:
         return redirect('/')
 
-    conn = mysql.connector.connect(**DB_CONFIG)
+    conn = mysql.connector.connect(**reader_config)
     cursor = conn.cursor(dictionary=True)
     cursor.execute("SELECT * FROM players")
     players = cursor.fetchall()
@@ -110,7 +118,7 @@ def signup():
     username = request.form['username']
     password = request.form['password']
 
-    conn = mysql.connector.connect(**DB_CONFIG)
+    conn = mysql.connector.connect(**writer_config)
     cursor = conn.cursor()
     cursor.execute("INSERT INTO users (username, password) VALUES (%s, %s)", (username, password))
     conn.commit()
@@ -125,7 +133,7 @@ def login():
     username = request.form['username']
     password = request.form['password']
 
-    conn = mysql.connector.connect(**DB_CONFIG)
+    conn = mysql.connector.connect(**reader_config)
     cursor = conn.cursor(dictionary=True)
     cursor.execute("SELECT * FROM users WHERE username=%s AND password=%s", (username, password))
     user = cursor.fetchone()
@@ -139,4 +147,3 @@ def login():
             <h3>Login failed. Please try again.</h3>
             <a href="/">Go to Home</a>
         '''
-
