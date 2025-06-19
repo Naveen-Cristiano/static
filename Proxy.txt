@@ -56,10 +56,6 @@ def dashboard():
         return html
     return "Failed to load players"
 
-# ✅ New Route for ALB Path-Based Routing
-@app.route('/new')
-def new():
-    return "<h3>This is the NEW route handled by the Frontend microservice!</h3>"
-
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", 
+
