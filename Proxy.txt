@@ -1,16 +1,65 @@
-#!/bin/bash
+from flask import Flask, render_template_string, request, redirect
+import requests
 
-# Start Nginx
-systemctl start nginx
+app = Flask(__name__)
 
-# Start auth_service
-cd /home/ec2-user/microservices/auth_service
-nohup gunicorn -w 3 -b 127.0.0.1:5001 app:app &
+AUTH_SERVICE_URL = "http://127.0.0.1:5001"
+PLAYER_SERVICE_URL = "http://127.0.0.1:5002"
 
-# Start player_service
-cd /home/ec2-user/microservices/player_service
-nohup gunicorn -w 3 -b 127.0.0.1:5002 app:app &
+@app.route('/')
+def home():
+    return render_template_string('''
+        <h1>Welcome to Real Madrid Fan Page</h1>
+        <a href="/login">Login</a> | <a href="/signup">Signup</a>
+    ''')
 
-# Start frontend
-cd /home/ec2-user/microservices/frontend
-nohup gunicorn -w 3 -b 127.0.0.1:5000 app:app &
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if request.method == 'POST':
+        res = requests.post(f"{AUTH_SERVICE_URL}/signup", data=request.form)
+        if res.status_code == 200:
+            return redirect('/dashboard')
+        return "Signup Failed"
+    return render_template_string('''
+        <h2>Signup</h2>
+        <form method="post">
+            Username: <input name="username"><br>
+            Password: <input name="password" type="password"><br>
+            <button type="submit">Signup</button>
+        </form>
+    ''')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        res = requests.post(f"{AUTH_SERVICE_URL}/login", data=request.form)
+        if res.status_code == 200:
+            return redirect('/dashboard')
+        return "Login Failed"
+    return render_template_string('''
+        <h2>Login</h2>
+        <form method="post">
+            Username: <input name="username"><br>
+            Password: <input name="password" type="password"><br>
+            <button type="submit">Login</button>
+        </form>
+    ''')
+
+@app.route('/dashboard')
+def dashboard():
+    res = requests.get(f"{PLAYER_SERVICE_URL}/players")
+    if res.status_code == 200:
+        players = res.json()
+        html = "<h2>Players</h2>"
+        for p in players:
+            html += f"<p>{p['player_name']}<br><img src='{p['image_file']}' width='200'></p>"
+        return html
+    return "Failed to load players"
+
+# ✅ New Route for ALB Path-Based Routing
+@app.route('/new')
+def new():
+    return "<h3>This is the NEW route handled by the Frontend microservice!</h3>"
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
