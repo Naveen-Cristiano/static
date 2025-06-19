@@ -1,12 +1,60 @@
-server {
-    listen 80;
-    server_name _;
+from flask import Flask, render_template_string, request, redirect
+import requests
 
-    location / {
-        proxy_pass http://127.0.0.1:5000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
+app = Flask(__name__)
+
+AUTH_SERVICE_URL = "http://127.0.0.1:5001"
+PLAYER_SERVICE_URL = "http://127.0.0.1:5002"
+
+@app.route('/new')
+def home():
+    return render_template_string('''
+        <h1>Welcome to Real Madrid Fan Page</h1>
+        <a href="/new/login">Login</a> | <a href="/new/signup">Signup</a>
+    ''')
+
+@app.route('/new/signup', methods=['GET', 'POST'])
+def signup():
+    if request.method == 'POST':
+        res = requests.post(f"{AUTH_SERVICE_URL}/signup", data=request.form)
+        if res.status_code == 200:
+            return redirect('/new/dashboard')
+        return "Signup Failed"
+    return render_template_string('''
+        <h2>Signup</h2>
+        <form method="post">
+            Username: <input name="username"><br>
+            Password: <input name="password" type="password"><br>
+            <button type="submit">Signup</button>
+        </form>
+    ''')
+
+@app.route('/new/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        res = requests.post(f"{AUTH_SERVICE_URL}/login", data=request.form)
+        if res.status_code == 200:
+            return redirect('/new/dashboard')
+        return "Login Failed"
+    return render_template_string('''
+        <h2>Login</h2>
+        <form method="post">
+            Username: <input name="username"><br>
+            Password: <input name="password" type="password"><br>
+            <button type="submit">Login</button>
+        </form>
+    ''')
+
+@app.route('/new/dashboard')
+def dashboard():
+    res = requests.get(f"{PLAYER_SERVICE_URL}/players")
+    if res.status_code == 200:
+        players = res.json()
+        html = "<h2>Players</h2>"
+        for p in players:
+            html += f"<p>{p['player_name']}<br><img src='{p['image_file']}' width='200'></p>"
+        return html
+    return "Failed to load players"
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
